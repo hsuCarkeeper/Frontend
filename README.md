@@ -1,7 +1,5 @@
 # Frontend
 
-# Frontend
-
 
 ### 🔹코드 규칙
 
