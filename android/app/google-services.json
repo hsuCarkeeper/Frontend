@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "162127967277",
+    "project_id": "checkandgo-e1045",
+    "storage_bucket": "checkandgo-e1045.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162127967277:android:3dc448dd76b0b93bc0f4a4",
+        "android_client_info": {
+          "package_name": "com.checkandgo.checkandgo_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_9ZFaxgZaUfw5oUEDJYB3qqiJiqdKsS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162127967277:android:caebbf51bef9ac1ac0f4a4",
+        "android_client_info": {
+          "package_name": "com.project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_9ZFaxgZaUfw5oUEDJYB3qqiJiqdKsS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
