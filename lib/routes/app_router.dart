@@ -2,7 +2,6 @@ import 'package:go_router/go_router.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/calendar/calendar_screen.dart';
 import '../screens/checklist/checklist_screen.dart';
-import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/templates/templates_screen.dart';
 import '../screens/auth/login_screen.dart';
@@ -29,10 +28,6 @@ final appRouter = GoRouter(
         final tripId = state.pathParameters['tripId']!;
         return ChecklistScreen(tripId: tripId);
       },
-    ),
-    GoRoute(
-      path: '/notifications',
-      builder: (context, state) => const NotificationsScreen(),
     ),
     GoRoute(
       path: '/settings',
