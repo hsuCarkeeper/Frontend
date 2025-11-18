@@ -7,7 +7,6 @@ import '../screens/templates/templates_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/auth/welcome_screen.dart';
-import '../screens/auth/forgot_password_screen.dart';
 import '../screens/not_found_screen.dart';
 
 final appRouter = GoRouter(
@@ -48,10 +47,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/auth/welcome',
       builder: (context, state) => const WelcomeScreen(),
-    ),
-    GoRoute(
-      path: '/auth/forgot-password',
-      builder: (context, state) => const ForgotPasswordScreen(),
     ),
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),
