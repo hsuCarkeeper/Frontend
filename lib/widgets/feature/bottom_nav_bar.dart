@@ -44,14 +44,6 @@ class BottomNavBar extends StatelessWidget {
                 onTap: () => context.go('/checklist'),
               ),
               _NavItem(
-                icon: Icons.notifications_outlined,
-                activeIcon: Icons.notifications,
-                label: '알림',
-                path: '/notifications',
-                isActive: currentPath == '/notifications',
-                onTap: () => context.go('/notifications'),
-              ),
-              _NavItem(
                 icon: Icons.settings_outlined,
                 activeIcon: Icons.settings,
                 label: '설정',

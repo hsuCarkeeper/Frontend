@@ -1,43 +1,189 @@
 import 'package:flutter/material.dart';
-import '../../widgets/feature/top_nav_bar.dart';
-import '../../widgets/feature/bottom_nav_bar.dart';
-import '../../widgets/base/custom_card.dart';
-
-class ChecklistItem {
-  final String id;
-  final String title;
-  final String category;
-  bool isCompleted;
-  final String priority; // 'high', 'medium', 'low'
-  final int? daysBeforeDeparture;
-
-  ChecklistItem({
-    required this.id,
-    required this.title,
-    required this.category,
-    required this.isCompleted,
-    required this.priority,
-    this.daysBeforeDeparture,
-  });
-}
+import 'package:go_router/go_router.dart';
 
 class Trip {
   final String id;
-  final String title;
   final String destination;
-  final String startDate;
-  final String endDate;
+  final String country;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int completionRate;
+  final int daysLeft;
+  final String weather;
   final String flag;
 
   Trip({
     required this.id,
-    required this.title,
     required this.destination,
+    required this.country,
     required this.startDate,
     required this.endDate,
+    required this.completionRate,
+    required this.daysLeft,
+    required this.weather,
     required this.flag,
   });
 }
+
+class ChecklistItem {
+  final String id;
+  final String title;
+  bool isCompleted;
+
+  ChecklistItem({
+    required this.id,
+    required this.title,
+    this.isCompleted = false,
+  });
+}
+
+class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final bool showBack;
+  final List<Widget>? actions;
+  const TopNavBar({super.key, required this.title, this.showBack = false, this.actions});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Text(title, style: const TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.bold)),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      automaticallyImplyLeading: showBack,
+      actions: actions,
+    );
+  }
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class BottomNavBar extends StatelessWidget {
+  final String currentPath;
+
+  const BottomNavBar({super.key, required this.currentPath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+      ),
+      child: SafeArea(
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
+                label: '홈',
+                path: '/',
+                isActive: currentPath == '/',
+                onTap: () => context.go('/'),
+              ),
+              _NavItem(
+                icon: Icons.calendar_today_outlined,
+                activeIcon: Icons.calendar_today,
+                label: '캘린더',
+                path: '/calendar',
+                isActive: currentPath == '/calendar',
+                onTap: () => context.go('/calendar'),
+              ),
+              _NavItem(
+                icon: Icons.check_box_outlined,
+                activeIcon: Icons.check_box,
+                label: '체크리스트',
+                path: '/checklist',
+                isActive: currentPath == '/checklist',
+                onTap: () => context.go('/checklist'),
+              ),
+              _NavItem(
+                icon: Icons.settings_outlined,
+                activeIcon: Icons.settings,
+                label: '설정',
+                path: '/settings',
+                isActive: currentPath == '/settings',
+                onTap: () => context.go('/settings'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final String path;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.path,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isActive ? activeIcon : icon,
+              color: isActive ? const Color(0xFF2E80EC) : const Color(0xFF555555),
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isActive ? const Color(0xFF2E80EC) : const Color(0xFF555555),
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomCard extends StatelessWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  const CustomCard({super.key, required this.child, this.onTap});
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 10, spreadRadius: 1)],
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+
 
 class ChecklistScreen extends StatefulWidget {
   final String? tripId;
@@ -49,103 +195,29 @@ class ChecklistScreen extends StatefulWidget {
 }
 
 class _ChecklistScreenState extends State<ChecklistScreen> {
+  String filterStatus = 'all';
   Trip? selectedTrip;
-  String selectedCategory = '전체';
 
-  final List<String> categories = ['전체', '서류', '교통', '숙박', '보험', '금융', '준비물'];
-
+  // 임시 데이터
   final List<Trip> trips = [
     Trip(
       id: '1',
-      title: '도쿄 여행',
-      destination: '일본 도쿄',
-      startDate: '2024-03-15',
-      endDate: '2024-03-20',
+      destination: '도쿄',
+      country: '일본',
+      startDate: DateTime(2024, 3, 15),
+      endDate: DateTime(2024, 3, 20),
+      completionRate: 0,
+      daysLeft: 12,
+      weather: '☀️',
       flag: '🇯🇵',
-    ),
-    Trip(
-      id: '2',
-      title: '파리 여행',
-      destination: '프랑스 파리',
-      startDate: '2024-04-10',
-      endDate: '2024-04-17',
-      flag: '🇫🇷',
-    ),
-    Trip(
-      id: '3',
-      title: '방콕 여행',
-      destination: '태국 방콕',
-      startDate: '2024-05-01',
-      endDate: '2024-05-07',
-      flag: '🇹🇭',
     ),
   ];
 
   final List<ChecklistItem> checklistItems = [
-    ChecklistItem(
-      id: '1',
-      title: '여권 유효기간 확인',
-      category: '서류',
-      isCompleted: true,
-      priority: 'high',
-      daysBeforeDeparture: 30,
-    ),
-    ChecklistItem(
-      id: '2',
-      title: '비자 신청',
-      category: '서류',
-      isCompleted: false,
-      priority: 'high',
-      daysBeforeDeparture: 21,
-    ),
-    ChecklistItem(
-      id: '3',
-      title: '항공권 예약',
-      category: '교통',
-      isCompleted: true,
-      priority: 'high',
-      daysBeforeDeparture: 14,
-    ),
-    ChecklistItem(
-      id: '4',
-      title: '숙소 예약',
-      category: '숙박',
-      isCompleted: false,
-      priority: 'high',
-      daysBeforeDeparture: 14,
-    ),
-    ChecklistItem(
-      id: '5',
-      title: '여행자 보험 가입',
-      category: '보험',
-      isCompleted: false,
-      priority: 'medium',
-      daysBeforeDeparture: 7,
-    ),
-    ChecklistItem(
-      id: '6',
-      title: '현지 통화 환전',
-      category: '금융',
-      isCompleted: false,
-      priority: 'medium',
-      daysBeforeDeparture: 3,
-    ),
-    ChecklistItem(
-      id: '7',
-      title: '짐 싸기',
-      category: '준비물',
-      isCompleted: false,
-      priority: 'medium',
-      daysBeforeDeparture: 1,
-    ),
-    ChecklistItem(
-      id: '8',
-      title: '충전기 및 어댑터',
-      category: '준비물',
-      isCompleted: false,
-      priority: 'low',
-      daysBeforeDeparture: 1,
-    ),
+    ChecklistItem(id: '1', title: '여권 챙기기', isCompleted: true),
+    ChecklistItem(id: '2', title: '환전하기', isCompleted: false),
+    ChecklistItem(id: '3', title: '돼지코 어댑터', isCompleted: false),
+    ChecklistItem(id: '4', title: '비상약', isCompleted: false),
   ];
 
   @override
@@ -153,13 +225,29 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     super.initState();
     if (widget.tripId != null && trips.isNotEmpty) {
       selectedTrip = trips.firstWhere(
-        (trip) => trip.id == widget.tripId,
+            (t) => t.id == widget.tripId,
         orElse: () => trips.first,
       );
     } else if (trips.isNotEmpty) {
       selectedTrip = trips.first;
     }
   }
+
+  List<ChecklistItem> get filteredItems {
+    switch (filterStatus) {
+      case 'checked':
+        return checklistItems.where((item) => item.isCompleted).toList();
+      case 'unchecked':
+        return checklistItems.where((item) => !item.isCompleted).toList();
+      default:
+        return checklistItems;
+    }
+  }
+
+  int get completedCount => checklistItems.where((item) => item.isCompleted).length;
+  int get completionRate => checklistItems.isEmpty
+      ? 0
+      : ((completedCount / checklistItems.length) * 100).round();
 
   void toggleItem(String id) {
     setState(() {
@@ -168,172 +256,74 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     });
   }
 
-  List<ChecklistItem> get filteredItems {
-    if (selectedCategory == '전체') {
-      return checklistItems;
-    }
-    return checklistItems
-        .where((item) => item.category == selectedCategory)
-        .toList();
-  }
-
-  int get completedCount =>
-      checklistItems.where((item) => item.isCompleted).length;
-  int get completionRate =>
-      ((completedCount / checklistItems.length) * 100).round();
-
-  Color getPriorityColor(String priority) {
-    switch (priority) {
-      case 'high':
-        return Colors.red;
-      case 'medium':
-        return Colors.orange;
-      case 'low':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData getPriorityIcon(String priority) {
-    switch (priority) {
-      case 'high':
-        return Icons.error_outline;
-      case 'medium':
-        return Icons.info_outline;
-      case 'low':
-        return Icons.check_circle_outline;
-      default:
-        return Icons.check_circle_outline;
-    }
-  }
-
-  String formatDate(String dateString) {
-    final date = DateTime.parse(dateString);
-    return '${date.month}/${date.day}';
+  void showAddItemDialog() {
+    final TextEditingController controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 항목 추가'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: '챙겨야 할 물건을 입력하세요',
+            border: OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                setState(() {
+                  checklistItems.add(ChecklistItem(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    title: controller.text,
+                    isCompleted: false,
+                  ));
+                });
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('추가', style: TextStyle(color: Color(0xFF2E80EC))),
+          ),
+        ],
+      ),
+    );
   }
 
   void showTripSelectorModal() {
+    if (trips.isEmpty) return;
+
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // 핸들
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // 헤더
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '여행 선택',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(),
-            // 여행 목록
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: trips.length,
-                itemBuilder: (context, index) {
-                  final trip = trips[index];
-                  final isSelected = selectedTrip?.id == trip.id;
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: CustomCard(
-                      onTap: () {
-                        setState(() {
-                          selectedTrip = trip;
-                        });
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          border: isSelected
-                              ? Border.all(
-                                  color: const Color(0xFF2E6BFF), width: 2)
-                              : null,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              trip.flag,
-                              style: const TextStyle(fontSize: 40),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    trip.title,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    trip.destination,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[400],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (isSelected)
-                              const Icon(
-                                Icons.check_circle,
-                                color: Color(0xFF2E6BFF),
-                                size: 28,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            const Text('여행 선택', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            ...trips.map((trip) => ListTile(
+              leading: Text(trip.flag, style: const TextStyle(fontSize: 24)),
+              title: Text('${trip.destination} 여행'),
+              subtitle: Text('${trip.startDate.month}/${trip.startDate.day} - ${trip.endDate.month}/${trip.endDate.day}'),
+              onTap: () {
+                setState(() {
+                  selectedTrip = trip;
+                });
+                Navigator.pop(context);
+              },
+              trailing: selectedTrip?.id == trip.id
+                  ? const Icon(Icons.check, color: Color(0xFF2E80EC))
+                  : null,
+            )),
           ],
         ),
       ),
@@ -342,303 +332,291 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (selectedTrip == null) {
+      return Scaffold(
+        appBar: const TopNavBar(title: '체크리스트'),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.luggage_outlined, size: 64, color: Colors.grey),
+              SizedBox(height: 16),
+              Text('등록된 여행이 없습니다.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+            ],
+          ),
+        ),
+        bottomNavigationBar: const BottomNavBar(currentPath: '/checklist'),
+      );
+    }
+
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: TopNavBar(
         title: '체크리스트',
-        showBack: widget.tripId != null,
         actions: [
           IconButton(
-            icon: const Icon(Icons.list),
+            icon: const Icon(Icons.swap_horiz),
             onPressed: showTripSelectorModal,
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 선택된 여행 정보
-            if (selectedTrip != null)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: CustomCard(
-                  onTap: showTripSelectorModal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            selectedTrip!.flag,
-                            style: const TextStyle(fontSize: 32),
-                          ),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                selectedTrip!.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Text(
-                                selectedTrip!.destination,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              Text(
-                                '${formatDate(selectedTrip!.startDate)} - ${formatDate(selectedTrip!.endDate)}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[400],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-                    ],
-                  ),
-                ),
-              ),
-
-            // 진행률 카드
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2E6BFF), Color(0xFF00B894)],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    Row(
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // 여행 정보 카드
+                  CustomCard(
+                    onTap: showTripSelectorModal,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
                           children: [
-                            const Text(
-                              '여행 준비 현황',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '$completedCount/${checklistItems.length} 항목 완료',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
-                              ),
+                            Text(selectedTrip!.flag, style: const TextStyle(fontSize: 32)),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${selectedTrip!.destination} 여행',
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                                Text(
+                                  '${selectedTrip!.country} ${selectedTrip!.destination}',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                ),
+                                Text(
+                                  '${selectedTrip!.startDate.month}/${selectedTrip!.startDate.day} - ${selectedTrip!.endDate.month}/${selectedTrip!.endDate.day}',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '$completionRate%',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '완료율',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                        const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 진행률 카드
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [
+                        const Color(0xFF2E80EC).withOpacity(0.7), //피그마 파랑
+                        const Color(0xFF009A6B).withOpacity(0.4), //피그마 녹색
+                      ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF2E80EC).withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: LinearProgressIndicator(
-                        value: completionRate / 100,
-                        minHeight: 8,
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // 카테고리 필터
-            SizedBox(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  final isSelected = selectedCategory == category;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(category),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        setState(() {
-                          selectedCategory = category;
-                        });
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // 체크리스트 아이템들
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filteredItems.length,
-              itemBuilder: (context, index) {
-                final item = filteredItems[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: CustomCard(
-                    onTap: () => toggleItem(item.id),
-                    child: Row(
+                    child: Column(
                       children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: item.isCompleted
-                                  ? const Color(0xFF2E6BFF)
-                                  : Colors.grey[300]!,
-                              width: 2,
-                            ),
-                            color: item.isCompleted
-                                ? const Color(0xFF2E6BFF)
-                                : Colors.transparent,
-                          ),
-                          child: item.isCompleted
-                              ? const Icon(
-                                  Icons.check,
-                                  size: 16,
-                                  color: Colors.white,
-                                )
-                              : null,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.title,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: item.isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                  color: item.isCompleted ? Colors.grey : null,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  '여행 준비 현황',
+                                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      item.category,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ),
-                                  if (item.daysBeforeDeparture != null) ...[
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '출발 ${item.daysBeforeDeparture}일 전',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[400],
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ],
-                          ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '$completedCount/${checklistItems.length} 항목 완료',
+                                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              '$completionRate%',
+                              style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
-                        Icon(
-                          getPriorityIcon(item.priority),
-                          size: 20,
-                          color: getPriorityColor(item.priority),
+                        const SizedBox(height: 16),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: checklistItems.isEmpty ? 0 : completionRate / 100,
+                            minHeight: 8,
+                            backgroundColor: Colors.white.withOpacity(0.3),
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                  const SizedBox(height: 24),
 
-            if (filteredItems.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(48),
-                child: Column(
+                  // 필터 버튼
+                  Row(
+                    children: [
+                      _FilterChip(
+                        label: '전체',
+                        isSelected: filterStatus == 'all',
+                        onTap: () => setState(() => filterStatus = 'all'),
+                      ),
+                      const SizedBox(width: 8),
+                      _FilterChip(
+                        label: '체크',
+                        isSelected: filterStatus == 'checked',
+                        onTap: () => setState(() => filterStatus = 'checked'),
+                      ),
+                      const SizedBox(width: 8),
+                      _FilterChip(
+                        label: '미체크',
+                        isSelected: filterStatus == 'unchecked',
+                        onTap: () => setState(() => filterStatus = 'unchecked'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 체크리스트 목록
+                  if (filteredItems.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Center(
+                        child: Text(
+                          filterStatus == 'all' ? '항목을 추가해보세요!' : '해당하는 항목이 없습니다.',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: filteredItems.length,
+                      itemBuilder: (context, index) {
+                        final item = filteredItems[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: CustomCard(
+                            onTap: () => toggleItem(item.id),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: item.isCompleted ? const Color(0xFF2E80EC) : Colors.transparent,
+                                    border: Border.all(
+                                      color: item.isCompleted ? const Color(0xFF2E80EC) : Colors.grey[300]!,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: item.isCompleted
+                                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    item.title,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: item.isCompleted ? Colors.grey : Colors.black87,
+                                      decoration: item.isCompleted ? TextDecoration.lineThrough : null,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  // 스크롤 영역 하단 여백
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+          // 새 항목 추가 버튼
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(color: Colors.grey.shade200)),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: showAddItemDialog,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E80EC),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.check_box_outline_blank,
-                        size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
+                    Icon(Icons.add, color: Colors.white),
+                    SizedBox(width: 8),
                     Text(
-                      '해당 카테고리에 항목이 없어요',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      '새 항목 추가',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ],
                 ),
               ),
-
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: AddItemModal 구현
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('항목 추가 기능은 준비 중입니다')),
-          );
-        },
-        child: const Icon(Icons.add),
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: const BottomNavBar(currentPath: '/checklist'),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF2E80EC) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected ? null : Border.all(color: Colors.grey[300]!),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey[600],
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 }
