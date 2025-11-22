@@ -29,7 +29,7 @@ class CustomButton extends StatelessWidget {
     Color getBackgroundColor() {
       switch (variant) {
         case ButtonVariant.primary:
-          return const Color(0xFF2E6BFF);
+          return const Color(0xFF2E80EC);
         case ButtonVariant.secondary:
           return const Color(0xFF00B894);
         case ButtonVariant.outline:
@@ -45,7 +45,7 @@ class CustomButton extends StatelessWidget {
         case ButtonVariant.secondary:
           return Colors.white;
         case ButtonVariant.outline:
-          return const Color(0xFF2E6BFF);
+          return const Color(0xFF2E80EC);
         case ButtonVariant.ghost:
           return const Color(0xFF555555);
       }
@@ -53,11 +53,12 @@ class CustomButton extends StatelessWidget {
 
     BorderSide? getBorderSide() {
       if (variant == ButtonVariant.outline) {
-        return const BorderSide(color: Color(0xFF2E6BFF), width: 2);
+        return const BorderSide(color: Color(0xFF2E80EC), width: 2); //아웃라인 색상도 맞춤
       }
       return null;
     }
 
+    //[크기 결정 부분 1] - 패딩
     EdgeInsets getPadding() {
       switch (size) {
         case ButtonSize.sm:
@@ -69,6 +70,7 @@ class CustomButton extends StatelessWidget {
       }
     }
 
+    //[크기 결정 부분 2] - 폰트 크기
     double getFontSize() {
       switch (size) {
         case ButtonSize.sm:
