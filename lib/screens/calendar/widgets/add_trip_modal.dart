@@ -209,11 +209,20 @@ class _AddTripModalState extends State<AddTripModal> {
               width: 350,
               height: 40,
               child: ElevatedButton(
-                onPressed: _handleSave,
+                onPressed: () {
+                  Navigator.pop(context); //현재 modal 닫기
+
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (ctx) => const AddTripModal2(), //modal2로 이동
+                  );
+                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2E6BFF),
+                  backgroundColor: const Color(0xFF2E80EC),
                   foregroundColor: Colors.white,
-                  elevation: 0,
+                  elevation: 0, //높이 차이 없애기
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
