@@ -254,17 +254,17 @@ class _AddTripModalState extends State<AddTripModal> {
           hintText: hint,
           hintStyle: TextStyle(color: Colors.grey, fontSize: 14), //텍스트 박스 안 예시 텍스트
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          
+
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: Color(0xFFBFBFBF)), //텍스트 박스 보더 설정
           ),
-          
+
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: Color(0xFFBFBFBF)),
           ),
-          
+
           focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(8)),
             borderSide: BorderSide(color: Color(0xFF2E6BFF)),
@@ -274,7 +274,7 @@ class _AddTripModalState extends State<AddTripModal> {
     );
   }
 
-  
+
   //출발일, 도착일 커스텀 부분
   Widget _buildDatePickerField(
       BuildContext context, {
