@@ -59,7 +59,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                   '새 여행 계획',
                   style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFF000000),
                   ),
                 ),
@@ -96,7 +96,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                       '여행 세부사항',
                       style: TextStyle(
                         fontSize: 19,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF000000),
                       ),
                     ),
@@ -106,8 +106,8 @@ class _AddTripModal2State extends State<AddTripModal2> {
                     const Text(
                       '여행 인원',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF858585),
                       ),
                     ),
@@ -124,8 +124,8 @@ class _AddTripModal2State extends State<AddTripModal2> {
                         Text(
                           '$people 명',
                           style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(width: 24),
@@ -142,7 +142,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                       '예산 (선택사항)',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF858585),
                       ),
                     ),
@@ -160,7 +160,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                       '여행 이름',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF858585),
                       ),
                     ),
@@ -178,7 +178,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                       '여행 목적',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF858585),
                       ),
                     ),
@@ -213,7 +213,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                     ),
 
 
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 16), //밑에서 16까지 스크롤 가능
                   ],
                 ),
               ),
@@ -239,7 +239,9 @@ class _AddTripModal2State extends State<AddTripModal2> {
                 ),
                 child: const Text(
                   '확인',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 14,
+                    fontWeight: FontWeight.w600,),
+
                 ),
               ),
             ),
