@@ -38,7 +38,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
     return Container(
       //흰 모달창
       width: 390,
-      height: 676,
+      height: 688,
       decoration: const BoxDecoration(
 
         color: Colors.white,
@@ -50,7 +50,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
         children: [
           // 헤더
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 17, 0),
+            padding: const EdgeInsets.fromLTRB(20, 10, 17, 0),
 
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,//헤더 제목이랑 'x' 사이에 공백 두고 배치
@@ -71,7 +71,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8), //원래는 20인데 헤더를 묶어버리면서 박스가 형성됌->8로 설정
 
           // 진행 바
           Padding(
@@ -84,7 +84,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
@@ -111,7 +111,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                         color: Color(0xFF858585),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     Row(
                       children: [
@@ -120,7 +120,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                             setState(() => people--);
                           }
                         }),
-                        const SizedBox(width: 24),
+                        const SizedBox(width: 20),
                         Text(
                           '$people 명',
                           style: const TextStyle(
@@ -128,14 +128,14 @@ class _AddTripModal2State extends State<AddTripModal2> {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(width: 24),
+                        const SizedBox(width: 20),
                         _circleButton(Icons.add, () {
                           setState(() => people++);
                         }),
                       ],
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // 예산
                     const Text(
@@ -146,14 +146,14 @@ class _AddTripModal2State extends State<AddTripModal2> {
                         color: Color(0xFF858585),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     _inputField(
                       controller: _budgetController,
                       hint: '예: 100만원, \$1000',
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // 여행 이름
                     const Text(
@@ -164,14 +164,14 @@ class _AddTripModal2State extends State<AddTripModal2> {
                         color: Color(0xFF858585),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     _inputField(
                       controller: _tripNameController,
                       hint: '예: 유럽 여행, 일본 1달 살기',
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // 여행 목적
                     const Text(
@@ -222,7 +222,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
 
           // 확인 버튼
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24), //여행 목적 버튼과 24 간격
             child: SizedBox(
               width: 350,
               height: 44,
@@ -260,8 +260,8 @@ class _AddTripModal2State extends State<AddTripModal2> {
         customBorder: const CircleBorder(),
         onTap: onTap,
         child: SizedBox(
-          width: 36,
-          height: 36,
+          width: 40,
+          height: 40,
           child: Icon(icon, size: 20, color: Colors.black),
         ),
       ),
