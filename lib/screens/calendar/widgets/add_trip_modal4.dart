@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'add_trip_modal4.dart';
-import 'add_trip_modal2.dart';
 
-class AddTripModal3 extends StatefulWidget {
-  const AddTripModal3({super.key});
+class AddTripModal4 extends StatefulWidget {
+  const AddTripModal4({super.key});
 
   @override
-  State<AddTripModal3> createState() => _AddTripModal3State();
+  State<AddTripModal4> createState() => _AddTripModal4State();
 }
 
-class _AddTripModal3State extends State<AddTripModal3> {
+class _AddTripModal4State extends State<AddTripModal4> {
   String? selectedStay;
   String? selectedTransport;
 
@@ -269,7 +267,7 @@ class _AddTripModal3State extends State<AddTripModal3> {
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
-                          builder: (ctx) => const AddTripModal2(), // 🔥 modal3로 이동
+                          builder: (ctx) => const AddTripModal4(), // 🔥 modal3로 이동
                         );
 
                       },
@@ -301,15 +299,7 @@ class _AddTripModal3State extends State<AddTripModal3> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (ctx) => const AddTripModal4(), // 🔥 modal3로 이동
-                        );
-
-
+                        // 여기에 modal4 연결 가능
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2E6BFF),
