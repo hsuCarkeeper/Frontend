@@ -1,38 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-// =========================================
-// 1. 데이터 모델
-// =========================================
-class Trip {
-  final String id;
-  final String destination;
-  final String country;
-  final DateTime startDate;
-  final DateTime endDate;
-  final int completionRate;
-  final int daysLeft;
-  final String weather;
-  final String flag;
-
-  Trip({
-    required this.id,
-    required this.destination,
-    required this.country,
-    required this.startDate,
-    required this.endDate,
-    required this.completionRate,
-    required this.daysLeft,
-    required this.weather,
-    required this.flag,
-  });
-
-  // 날짜 포맷 게터 (예: 3박 4일)
-  String get dateRange {
-    final diff = endDate.difference(startDate).inDays;
-    return '$diff박 ${diff + 1}일';
-  }
-}
+import '../../models/trip_response.dart';
+import '../../services/trip_service.dart';
+import '../calendar/widgets/add_trip_modal.dart';
 
 // =========================================
 // 2. 공통 위젯 (TopNavBar, CustomCard, CustomButton, BottomNavBar)
@@ -51,10 +21,9 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(
-          title,
-          style: const TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.bold)
-      ),
+      title: Text(title,
+          style: const TextStyle(
+              color: Color(0xFF111111), fontWeight: FontWeight.bold)),
       backgroundColor: const Color(0xFFF5F5F5), // 배경색 맞춤
       elevation: 0,
       centerTitle: true,
@@ -88,7 +57,9 @@ class CustomCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: gradient == null ? backgroundColor : null, // 그라데이션이 없으면 backgroundColor 사용
+          color: gradient == null
+              ? backgroundColor
+              : null, // 그라데이션이 없으면 backgroundColor 사용
           gradient: gradient, // 그라데이션 적용
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -107,6 +78,7 @@ class CustomCard extends StatelessWidget {
 }
 
 enum ButtonVariant { primary, ghost }
+
 enum ButtonSize { sm, md }
 
 class CustomButton extends StatelessWidget {
@@ -129,14 +101,17 @@ class CustomButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        backgroundColor: isGhost ? Colors.white.withOpacity(0.2) : const Color(0xFF2E6BFF),
+        backgroundColor:
+            isGhost ? Colors.white.withOpacity(0.2) : const Color(0xFF2E6BFF),
         padding: EdgeInsets.symmetric(
           horizontal: size == ButtonSize.sm ? 12 : 16,
           vertical: size == ButtonSize.sm ? 8 : 12,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: isGhost ? const BorderSide(color: Colors.white, width: 1) : BorderSide.none,
+          side: isGhost
+              ? const BorderSide(color: Colors.white, width: 1)
+              : BorderSide.none,
         ),
       ),
       child: Text(
@@ -236,9 +211,8 @@ class _NavItem extends StatelessWidget {
           children: [
             Icon(
               isActive ? activeIcon : icon,
-              color: isActive
-                  ? const Color(0xFF2E6BFF)
-                  : const Color(0xFF555555),
+              color:
+                  isActive ? const Color(0xFF2E6BFF) : const Color(0xFF555555),
               size: 24,
             ),
             const SizedBox(height: 4),
@@ -271,7 +245,37 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Trip> trips = [];
+  List<TripItem> trips = [];
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTrips();
+  }
+
+  Future<void> _loadTrips() async {
+    try {
+      setState(() {
+        isLoading = true;
+        errorMessage = null;
+      });
+
+      // TODO: 실제 API 연동 시 TripService.getTrips()로 변경
+      final response = await TripService.getMockTrips();
+
+      setState(() {
+        trips = response.items;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = '여행 목록을 불러오는데 실패했습니다.';
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -311,19 +315,187 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // 최근 여행
             const Text(
-              '최근 여행',
+              '다음 여행 일정',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF000000),
               ),
             ),
-            const SizedBox(height: 36),
+            const SizedBox(height: 16),
 
-            if (trips.isNotEmpty) ...trips.map((trip) =>
-            //여기에 일정 추가되면 컨테이너 들어와야됌
-            Container()
-            ) else ...[
+            // 로딩 중
+            if (isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(40.0),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            // 에러 발생
+            else if (errorMessage != null)
+              Center(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 32),
+                    const Icon(Icons.error_outline,
+                        size: 48, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: _loadTrips,
+                      child: const Text('다시 시도'),
+                    ),
+                  ],
+                ),
+              )
+            // 여행 목록이 있을 때
+            else if (trips.isNotEmpty)
+              ...trips.map((trip) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: CustomCard(
+                      onTap: () => context.go('/checklist/${trip.id}'),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 여행지 정보
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    trip.flagEmoji,
+                                    style: const TextStyle(fontSize: 32),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        trip.title,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF111111),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${trip.country} ${trip.city}',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF555555),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF2E80EC)
+                                          .withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      'D-${trip.dDay}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF2E80EC),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    trip.dateRangeFormatted,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFFAAAAAA),
+                                    ),
+                                  ),
+                                  Text(
+                                    trip.tripDuration,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFFAAAAAA),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // 진행률
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                '준비 완료',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF555555),
+                                ),
+                              ),
+                              Text(
+                                '${trip.progressPercentage}%',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2E80EC),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: LinearProgressIndicator(
+                              value: trip.progress,
+                              backgroundColor: Colors.grey.shade200,
+                              color: const Color(0xFF2E80EC),
+                              minHeight: 8,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // 체크리스트 보기
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                '체크리스트 보기',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFFAAAAAA),
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
+                                color: Colors.grey.shade400,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ))
+            // 여행이 없을 때
+            else ...[
               Center(
                 child: Column(
                   children: [
@@ -365,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
               //그라데이션 적용
               gradient: LinearGradient(
                 colors: [
-                 const Color(0xFF2E80EC).withOpacity(0.7), //피그마 파랑
+                  const Color(0xFF2E80EC).withOpacity(0.7), //피그마 파랑
                   const Color(0xFF009A6B).withOpacity(0.4), //피그마 녹색
                 ],
                 begin: Alignment.topCenter,
@@ -389,7 +561,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(height: 8),
                         Text(
                           '목적지와 일정을 추가해보세요',
-                          style: TextStyle(fontSize: 14,  color: Color(0xFFFFFFFF)),
+                          style:
+                              TextStyle(fontSize: 14, color: Color(0xFFFFFFFF)),
                         ),
                       ],
                     ),
@@ -398,7 +571,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     text: '시작하기',
                     variant: ButtonVariant.ghost,
                     size: ButtonSize.md,
-                    onPressed: () => context.go('/calendar'),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => AddTripModal(
+                          onSave: (trip) {
+                            // TODO: 여행 추가 후 목록 새로고침
+                            _loadTrips();
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
