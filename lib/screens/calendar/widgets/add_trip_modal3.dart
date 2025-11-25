@@ -306,7 +306,7 @@ class _AddTripModal3State extends State<AddTripModal3> {
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
-                          builder: (ctx) => const AddTripModal4(), // 🔥 modal3로 이동
+                          builder: (ctx) => const AddTripModal4(),
                         );
 
 

@@ -235,7 +235,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (ctx) => const AddTripModal3(), // 🔥 modal3로 이동
+                    builder: (ctx) => const AddTripModal3(), //modal3로 이동
                   );
                 },
                 style: ElevatedButton.styleFrom(

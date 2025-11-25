@@ -11,26 +11,6 @@ class _AddTripModal4State extends State<AddTripModal4> {
   String? selectedStay;
   String? selectedTransport;
 
-  //공통 버튼 설정
-  Widget _optionButton(String text, bool selected) {
-    return Container(
-      width: 168,
-      height: 44,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? const Color(0xFF2E6BFF) : const Color(0xFFF3F4F6),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: selected ? Colors.white : const Color(0xFF555555),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,172 +63,9 @@ class _AddTripModal4State extends State<AddTripModal4> {
 
           const SizedBox(height: 32),
 
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 숙박 및 교통
-                    const Text(
-                      "숙박 및 교통",
-                      style: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black,
-                      ),
-                    ),
 
-                    const SizedBox(height: 16),
 
-                    // 숙박 유형
-                    const Text(
-                      "숙박 유형",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF858585),
-                      ),
-                    ),
 
-                    const SizedBox(height: 16),
-
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () => setState(() => selectedStay = "호텔"),
-                              child: _optionButton(
-                                  "호텔", selectedStay == "호텔"),
-                            ),
-                            GestureDetector(
-                              onTap: () => setState(() => selectedStay = "리조트"),
-                              child: _optionButton(
-                                  "리조트", selectedStay == "리조트"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedStay = "게스트하우스"),
-                              child: _optionButton("게스트하우스",
-                                  selectedStay == "게스트하우스"),
-                            ),
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedStay = "에어비엔비"),
-                              child: _optionButton("에어비엔비",
-                                  selectedStay == "에어비엔비"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () => setState(() => selectedStay = "호스텔"),
-                              child: _optionButton(
-                                  "호스텔", selectedStay == "호스텔"),
-                            ),
-                            GestureDetector(
-                              onTap: () => setState(() => selectedStay = "기타"),
-                              child:
-                              _optionButton("기타", selectedStay == "기타"),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 주요 교통수단
-                    const Text(
-                      "주요 교통수단",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF858585),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedTransport = "항공기"),
-                              child: _optionButton("항공기",
-                                  selectedTransport == "항공기"),
-                            ),
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedTransport = "기차"),
-                              child: _optionButton(
-                                  "기차", selectedTransport == "기차"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedTransport = "버스"),
-                              child: _optionButton(
-                                  "버스", selectedTransport == "버스"),
-                            ),
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedTransport = "자동차"),
-                              child: _optionButton("자동차",
-                                  selectedTransport == "자동차"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedTransport = "선박"),
-                              child: _optionButton(
-                                  "선박", selectedTransport == "선박"),
-                            ),
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedTransport = "기타"),
-                              child: _optionButton(
-                                  "기타", selectedTransport == "기타"),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
-          ),
 
           //이전, 다음 버튼
           Padding(
@@ -267,7 +84,7 @@ class _AddTripModal4State extends State<AddTripModal4> {
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
-                          builder: (ctx) => const AddTripModal4(), // 🔥 modal3로 이동
+                          builder: (ctx) => const AddTripModal4(),
                         );
 
                       },
@@ -308,7 +125,7 @@ class _AddTripModal4State extends State<AddTripModal4> {
                         ),
                       ),
                       child: const Text(
-                        "다음",
+                        "완료",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
