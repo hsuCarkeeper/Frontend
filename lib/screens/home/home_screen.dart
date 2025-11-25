@@ -1,240 +1,32 @@
+/// HomeScreen - 메인 홈 화면
+/// 
+/// [주요 기능]
+/// - 사용자의 여행 목록을 카드 형태로 표시
+/// - 각 여행의 D-day, 진행률, 날짜 정보 표시
+/// - 여행 카드 클릭 시 해당 여행의 체크리스트 화면으로 이동
+/// - '새 여행 계획하기' 버튼으로 AddTripModal 호출
+/// 
+/// [API 연동]
+/// - TripService.getMockTrips()로 여행 목록 조회 (TODO: 실제 API로 전환)
+/// - 로딩, 에러, 빈 목록 상태 처리
+/// 
+/// [사용 위젯]
+/// - TopNavBar: 상단 앱바
+/// - CustomCard: 여행 카드 및 새 여행 추가 카드
+/// - CustomButton: '시작하기' 버튼
+/// - BottomNavBar: 하단 네비게이션 바
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/trip_response.dart';
 import '../../services/trip_service.dart';
+import '../../widgets/feature/top_nav_bar.dart';
+import '../../widgets/feature/bottom_nav_bar.dart';
+import '../../widgets/base/custom_card.dart';
+import '../../widgets/base/custom_button.dart';
 import '../calendar/widgets/add_trip_modal.dart';
 
 // =========================================
-// 2. 공통 위젯 (TopNavBar, CustomCard, CustomButton, BottomNavBar)
-// =========================================
-
-class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final List<Widget>? actions;
-
-  const TopNavBar({
-    super.key,
-    required this.title,
-    this.actions,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(title,
-          style: const TextStyle(
-              color: Color(0xFF111111), fontWeight: FontWeight.bold)),
-      backgroundColor: const Color(0xFFF5F5F5), // 배경색 맞춤
-      elevation: 0,
-      centerTitle: true,
-      actions: actions,
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class CustomCard extends StatelessWidget {
-  final Widget child;
-  final VoidCallback? onTap;
-  final Color? backgroundColor;
-  final Gradient? gradient; // ⭐️ 그라데이션 추가
-
-  const CustomCard({
-    super.key,
-    required this.child,
-    this.onTap,
-    this.backgroundColor = Colors.white, // 기본값 유지
-    this.gradient, // 그라데이션 초기화
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: gradient == null
-              ? backgroundColor
-              : null, // 그라데이션이 없으면 backgroundColor 사용
-          gradient: gradient, // 그라데이션 적용
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.05),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: child,
-      ),
-    );
-  }
-}
-
-enum ButtonVariant { primary, ghost }
-
-enum ButtonSize { sm, md }
-
-class CustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
-  final ButtonVariant variant;
-  final ButtonSize size;
-
-  const CustomButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-    this.variant = ButtonVariant.primary,
-    this.size = ButtonSize.md,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isGhost = variant == ButtonVariant.ghost;
-    return TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        backgroundColor:
-            isGhost ? Colors.white.withOpacity(0.2) : const Color(0xFF2E6BFF),
-        padding: EdgeInsets.symmetric(
-          horizontal: size == ButtonSize.sm ? 12 : 16,
-          vertical: size == ButtonSize.sm ? 8 : 12,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: isGhost
-              ? const BorderSide(color: Colors.white, width: 1)
-              : BorderSide.none,
-        ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isGhost ? Colors.white : Colors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: size == ButtonSize.sm ? 12 : 14,
-        ),
-      ),
-    );
-  }
-}
-
-class BottomNavBar extends StatelessWidget {
-  final String currentPath;
-
-  const BottomNavBar({super.key, required this.currentPath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
-                label: '홈',
-                path: '/',
-                isActive: currentPath == '/',
-                onTap: () => context.go('/'),
-              ),
-              _NavItem(
-                icon: Icons.calendar_today_outlined,
-                activeIcon: Icons.calendar_today,
-                label: '캘린더',
-                path: '/calendar',
-                isActive: currentPath == '/calendar',
-                onTap: () => context.go('/calendar'),
-              ),
-              _NavItem(
-                icon: Icons.check_box_outlined,
-                activeIcon: Icons.check_box,
-                label: '체크리스트',
-                path: '/checklist',
-                isActive: currentPath == '/checklist',
-                onTap: () => context.go('/checklist'),
-              ),
-              _NavItem(
-                icon: Icons.settings_outlined,
-                activeIcon: Icons.settings,
-                label: '설정',
-                path: '/settings',
-                isActive: currentPath == '/settings',
-                onTap: () => context.go('/settings'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final String path;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.path,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              color:
-                  isActive ? const Color(0xFF2E6BFF) : const Color(0xFF555555),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: isActive
-                    ? const Color(0xFF2E6BFF)
-                    : const Color(0xFF555555),
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// =========================================
-// 3. HomeScreen (메인)
+// HomeScreen (메인)
 // =========================================
 
 class HomeScreen extends StatefulWidget {
@@ -245,8 +37,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  /// 여행 목록 데이터
   List<TripItem> trips = [];
+  
+  /// 로딩 상태 플래그
   bool isLoading = true;
+  
+  /// 에러 메시지 (에러 발생 시에만 값 존재)
   String? errorMessage;
 
   @override
@@ -255,6 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadTrips();
   }
 
+  /// 여행 목록을 API에서 불러오는 메서드
+  /// 
+  /// [동작]
+  /// 1. 로딩 상태 활성화
+  /// 2. TripService를 통해 여행 목록 조회
+  /// 3. 성공 시 trips 리스트 업데이트, 실패 시 에러 메시지 표시
+  /// 
+  /// TODO: Mock 데이터를 실제 API(TripService.getTrips())로 교체 필요
   Future<void> _loadTrips() async {
     try {
       setState(() {

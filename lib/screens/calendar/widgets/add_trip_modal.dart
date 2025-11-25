@@ -1,19 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../models/trip.dart';
 
-class Trip {}
 class Country {}
-class CustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final ButtonVariant variant;
-  const CustomButton({super.key, required this.text, this.onPressed, this.variant = ButtonVariant.primary});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-enum ButtonVariant { primary, outline }
 
 class AddTripModal extends StatefulWidget {
   final void Function(Trip) onSave;
@@ -53,7 +41,7 @@ class _AddTripModalState extends State<AddTripModal> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(width: 48), 
+                const SizedBox(width: 48),
                 const Text(
                   '새 여행 계획',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -65,7 +53,6 @@ class _AddTripModalState extends State<AddTripModal> {
               ],
             ),
           ),
-          
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: LinearProgressIndicator(
@@ -78,7 +65,6 @@ class _AddTripModalState extends State<AddTripModal> {
               borderRadius: BorderRadius.circular(4),
             ),
           ),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),

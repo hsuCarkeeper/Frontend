@@ -1,167 +1,28 @@
+/// ChecklistScreen - 체크리스트 관리 화면
+/// 
+/// [주요 기능]
+/// - 여행별 준비물 체크리스트 관리 (조회, 추가, 수정, 삭제, 체크/언체크)
+/// - 여행 선택 모달을 통한 여행 전환
+/// - 진행률 카드로 완료 현황 시각화
+/// - 필터 기능 (전체/미완료/완료)
+/// 
+/// [API 연동]
+/// - ChecklistService.getMockChecklist()로 체크리스트 조회
+/// - CRUD 작업은 로컬 상태 업데이트 (TODO: 실제 API 연동)
+/// 
+/// [사용 위젯]
+/// - TopNavBar: 상단 앱바
+/// - CustomCard: 여행 선택 카드, 진행률 카드, 체크리스트 항목 카드
+/// - AddItemModal: 항목 추가/수정 모달
+/// - BottomNavBar: 하단 네비게이션 바
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../models/checklist_response.dart';
 import '../../models/trip_selector_response.dart';
 import '../../services/checklist_service.dart';
+import '../../widgets/feature/top_nav_bar.dart';
+import '../../widgets/feature/bottom_nav_bar.dart';
+import '../../widgets/base/custom_card.dart';
 import 'widgets/add_item_modal.dart';
-
-class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final bool showBack;
-  final List<Widget>? actions;
-  const TopNavBar(
-      {super.key, required this.title, this.showBack = false, this.actions});
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(title,
-          style: const TextStyle(
-              color: Color(0xFF111111), fontWeight: FontWeight.bold)),
-      backgroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-      automaticallyImplyLeading: showBack,
-      actions: actions,
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class BottomNavBar extends StatelessWidget {
-  final String currentPath;
-
-  const BottomNavBar({super.key, required this.currentPath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
-                label: '홈',
-                path: '/',
-                isActive: currentPath == '/',
-                onTap: () => context.go('/'),
-              ),
-              _NavItem(
-                icon: Icons.calendar_today_outlined,
-                activeIcon: Icons.calendar_today,
-                label: '캘린더',
-                path: '/calendar',
-                isActive: currentPath == '/calendar',
-                onTap: () => context.go('/calendar'),
-              ),
-              _NavItem(
-                icon: Icons.check_box_outlined,
-                activeIcon: Icons.check_box,
-                label: '체크리스트',
-                path: '/checklist',
-                isActive: currentPath == '/checklist',
-                onTap: () => context.go('/checklist'),
-              ),
-              _NavItem(
-                icon: Icons.settings_outlined,
-                activeIcon: Icons.settings,
-                label: '설정',
-                path: '/settings',
-                isActive: currentPath == '/settings',
-                onTap: () => context.go('/settings'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final String path;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.path,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              color:
-                  isActive ? const Color(0xFF2E80EC) : const Color(0xFF555555),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: isActive
-                    ? const Color(0xFF2E80EC)
-                    : const Color(0xFF555555),
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class CustomCard extends StatelessWidget {
-  final Widget child;
-  final VoidCallback? onTap;
-  const CustomCard({super.key, required this.child, this.onTap});
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.grey.withOpacity(0.05),
-                blurRadius: 10,
-                spreadRadius: 1)
-          ],
-        ),
-        child: child,
-      ),
-    );
-  }
-}
 
 class ChecklistScreen extends StatefulWidget {
   final String? tripId;
@@ -368,6 +229,64 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     }
   }
 
+  /// 체크리스트 항목 수정 모달을 표시하는 메서드
+  /// 
+  /// [매개변수]
+  /// - item: 수정할 체크리스트 항목
+  /// 
+  /// [동작]
+  /// 1. AddItemModal을 수정 모드(isEditMode: true)로 열기
+  /// 2. 기존 제목을 initialTitle로 전달
+  /// 3. 저장 시 로컬 상태 업데이트 (TODO: API 연동)
+  void showEditItemDialog(ChecklistItemApi item) {
+    if (selectedTrip == null) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: AddItemModal(
+          isEditMode: true,
+          initialTitle: item.title,
+          onSave: (title) async {
+            try {
+              // TODO: 실제 API 연동 시 _checklistService.updateItem() 사용
+              setState(() {
+                final index =
+                    checklistData!.items.indexWhere((i) => i.id == item.id);
+                if (index != -1) {
+                  checklistData!.items[index] = ChecklistItemApi(
+                    id: item.id,
+                    title: title,
+                    checked: item.checked,
+                  );
+                }
+              });
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('항목 수정 실패: $e')),
+                );
+              }
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  /// 새 체크리스트 항목 추가 모달을 표시하는 메서드
+  /// 
+  /// [동작]
+  /// 1. AddItemModal을 추가 모드로 열기
+  /// 2. 저장 시 새 항목을 checklistData.items에 추가
+  /// 3. summary(총 개수, 완료 개수, 진행률) 자동 업데이트
+  /// 
+  /// TODO: Mock 데이터 대신 ChecklistService.createItem() API 호출
   void showAddItemDialog() {
     if (selectedTrip == null) return;
 
@@ -823,6 +742,17 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                                             ? TextDecoration.lineThrough
                                             : null,
                                       ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit_outlined,
+                                        size: 20),
+                                    color: Colors.grey[600],
+                                    onPressed: () => showEditItemDialog(item),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 40,
+                                      minHeight: 40,
                                     ),
                                   ),
                                 ],

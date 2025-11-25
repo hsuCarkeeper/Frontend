@@ -47,7 +47,7 @@ class CustomButton extends StatelessWidget {
         case ButtonVariant.outline:
           return const Color(0xFF2E80EC);
         case ButtonVariant.ghost:
-          return const Color(0xFF555555);
+          return Colors.white;
       }
     }
 

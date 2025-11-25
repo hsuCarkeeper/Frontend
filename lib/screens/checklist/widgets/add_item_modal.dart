@@ -1,16 +1,57 @@
+/// AddItemModal - 체크리스트 항목 추가/수정 모달
+/// 
+/// [기능]
+/// - 새 항목 추가 모드 (isEditMode: false)
+/// - 기존 항목 수정 모드 (isEditMode: true)
+/// 
+/// [사용법]
+/// ```dart
+/// // 추가 모드
+/// AddItemModal(
+///   onSave: (title) { /* 저장 로직 */ },
+/// )
+/// 
+/// // 수정 모드
+/// AddItemModal(
+///   isEditMode: true,
+///   initialTitle: "기존 제목",
+///   onSave: (title) { /* 수정 로직 */ },
+/// )
+/// ```
 import 'package:flutter/material.dart';
 
 class AddItemModal extends StatefulWidget {
   final Function(String title) onSave;
+  final String? initialTitle;
+  final bool isEditMode;
 
-  const AddItemModal({super.key, required this.onSave});
+  const AddItemModal({
+    super.key,
+    required this.onSave,
+    this.initialTitle,
+    this.isEditMode = false,
+  });
 
   @override
   State<AddItemModal> createState() => _AddItemModalState();
 }
 
 class _AddItemModalState extends State<AddItemModal> {
+  /// 제목 입력 필드 컨트롤러
   final TextEditingController _titleController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // 수정 모드인 경우 기존 제목으로 초기화
+    if (widget.initialTitle != null) {
+      _titleController.text = widget.initialTitle!;
+    }
+    // 텍스트 변경 시 버튼 활성화 상태 업데이트를 위한 리스너
+    _titleController.addListener(() {
+      setState(() {}); // 버튼 활성화 상태 업데이트
+    });
+  }
 
   @override
   void dispose() {
@@ -18,6 +59,12 @@ class _AddItemModalState extends State<AddItemModal> {
     super.dispose();
   }
 
+  /// 저장 버튼 클릭 시 실행되는 메서드
+  /// 
+  /// [동작]
+  /// 1. 제목이 비어있지 않은지 확인
+  /// 2. onSave 콜백 실행 (부모 위젯에서 처리)
+  /// 3. 모달 닫기
   void handleSave() {
     if (_titleController.text.isNotEmpty) {
       widget.onSave(_titleController.text);
@@ -41,9 +88,10 @@ class _AddItemModalState extends State<AddItemModal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '새 항목 추가',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                widget.isEditMode ? '항목 수정' : '새 항목 추가',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               IconButton(
                 icon: const Icon(Icons.close),
@@ -122,9 +170,9 @@ class _AddItemModalState extends State<AddItemModal> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    '추가하기',
-                    style: TextStyle(
+                  child: Text(
+                    widget.isEditMode ? '수정하기' : '추가하기',
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
