@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'add_trip_modal3.dart';
 
 class AddTripModal2 extends StatefulWidget {
   const AddTripModal2({super.key});
@@ -18,7 +19,7 @@ class _AddTripModal2State extends State<AddTripModal2> {
       height: 44,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color(0xFFE5E7EB),
+        color: const Color(0xFFF3F4F6),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -222,13 +223,20 @@ class _AddTripModal2State extends State<AddTripModal2> {
 
           // 확인 버튼
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24), //여행 목적 버튼과 24 간격
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
             child: SizedBox(
               width: 350,
               height: 44,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // modal2 닫기
+
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (ctx) => const AddTripModal3(), // 🔥 modal3로 이동
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2E6BFF),
@@ -239,13 +247,15 @@ class _AddTripModal2State extends State<AddTripModal2> {
                 ),
                 child: const Text(
                   '확인',
-                  style: TextStyle(fontSize: 14,
-                    fontWeight: FontWeight.w600,),
-
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
           ),
+
         ],
       ),
     );
