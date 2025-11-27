@@ -5,34 +5,41 @@
 ## 📱 주요 기능
 
 ### 🔐 인증 시스템
+
 - **Welcome Screen**: 첫 실행 시 나타나는 환영 화면
 - **로그인/회원가입**: 사용자 계정 관리
 - **비밀번호 찾기**: 비밀번호 재설정 기능
 
 ### 🏠 홈 화면
+
 - 다가오는 여행 목록 확인
 - 여행별 준비 완료율 표시
 - D-day 카운터
 - 빠른 액션 메뉴 (템플릿, 알림 설정)
 
 ### 📅 캘린더
+
 - 여행 일정 관리
 - 새 여행 추가/수정
 
 ### ✅ 체크리스트
+
 - 여행별 준비물 체크리스트
 - 항목 추가/삭제/체크 기능
 - 카테고리별 분류
 
 ### 📋 템플릿
+
 - 미리 만들어진 체크리스트 템플릿
 - 여행 타입별 추천 준비물
 
 ### 🔔 알림
+
 - 출발 전 리마인더 설정
 - 준비물 알림
 
 ### ⚙️ 설정
+
 - 앱 환경 설정
 - 계정 관리
 
@@ -80,6 +87,7 @@ lib/
 ## 🚀 시작하기
 
 ### 필수 조건
+
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.0 이상)
 - Dart SDK (Flutter에 포함)
 - Android Studio / Xcode (모바일 개발용)
@@ -88,17 +96,20 @@ lib/
 ### 설치 및 실행
 
 1. **저장소 클론**
+
 ```bash
 git clone https://github.com/hsuCarkeeper/Frontend.git
 cd checkandgo_app
 ```
 
 2. **의존성 설치**
+
 ```bash
 flutter pub get
 ```
 
 3. **앱 실행**
+
 ```bash
 # 연결된 디바이스/에뮬레이터에서 실행
 flutter run
@@ -120,12 +131,14 @@ flutter run -d [device-id]
 ## 🎨 디자인 시스템
 
 ### 색상 테마
+
 - Primary: `#2E6BFF` (파란색)
 - Background: `#F7F8FA` (밝은 회색)
 - Text Primary: `#111111`
 - Text Secondary: `#555555`
 
 ### 커스텀 위젯
+
 - `CustomButton`: 다양한 스타일의 버튼 (primary, outline, ghost)
 - `CustomCard`: 그림자와 둥근 모서리가 있는 카드
 - `CustomFab`: 플로팅 액션 버튼

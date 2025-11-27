@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../../models/trip.dart';
 import 'add_trip_modal2.dart';
 
@@ -26,7 +27,7 @@ class _AddTripModalState extends State<AddTripModal> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
@@ -42,6 +43,7 @@ class _AddTripModalState extends State<AddTripModal> {
         );
       },
     );
+
     if (picked != null) {
       setState(() {
         if (isStart) {
@@ -56,32 +58,8 @@ class _AddTripModalState extends State<AddTripModal> {
     }
   }
 
-  void _handleSave() {
-    if (_countryController.text.isEmpty ||
-        _cityController.text.isEmpty ||
-        _startDate == null ||
-        _endDate == null) {
-      return; //입력값 확인 필요
-    }
-
-    final newTrip = Trip(
-      id: DateTime.now().toString(),
-      destination: _cityController.text,
-      country: _countryController.text,
-      startDate: _startDate!,
-      endDate: _endDate!,
-      completionRate: 0,
-      daysLeft: _startDate!.difference(DateTime.now()).inDays,
-
-    );
-
-    widget.onSave(newTrip);
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
-    //모달 창 시작
     return Container(
       width: double.infinity,
       height: 510,
@@ -91,9 +69,9 @@ class _AddTripModalState extends State<AddTripModal> {
       ),
       child: Column(
         children: [
-          //헤더
+          // 헤더
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 16, 0),//헤더 위치 설정
+            padding: const EdgeInsets.fromLTRB(24, 16, 16, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -102,34 +80,33 @@ class _AddTripModalState extends State<AddTripModal> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF000000),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.black),
+                  icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
 
-          //진행 바
+          // 진행 바
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: LinearProgressIndicator(
               value: 0.25,
-              backgroundColor: const Color(0xffEFEFEF),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2E80EC)),
               minHeight: 8,
               borderRadius: BorderRadius.circular(10),
+              backgroundColor: const Color(0xffEFEFEF),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF2E80EC)),
             ),
           ),
 
-          //내용 영역
+          // 내용
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24), //좌우 여백으로 입력창 너비 조정
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -139,9 +116,9 @@ class _AddTripModalState extends State<AddTripModal> {
                       style: TextStyle(
                         fontSize: 19,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF000000),
                       ),
                     ),
+
                     const SizedBox(height: 24),
 
                     _buildLabel('국가'),
@@ -162,6 +139,7 @@ class _AddTripModalState extends State<AddTripModal> {
 
                     const SizedBox(height: 12),
 
+                    // 날짜 선택
                     Row(
                       children: [
                         Expanded(
@@ -171,7 +149,6 @@ class _AddTripModalState extends State<AddTripModal> {
                               _buildLabel('출발일'),
                               const SizedBox(height: 4),
                               _buildDatePickerField(
-                                context,
                                 date: _startDate,
                                 onTap: () => _selectDate(context, true),
                               ),
@@ -186,7 +163,6 @@ class _AddTripModalState extends State<AddTripModal> {
                               _buildLabel('도착일'),
                               const SizedBox(height: 4),
                               _buildDatePickerField(
-                                context,
                                 date: _endDate,
                                 onTap: () => _selectDate(context, false),
                               ),
@@ -195,6 +171,7 @@ class _AddTripModalState extends State<AddTripModal> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
                   ],
                 ),
@@ -202,27 +179,25 @@ class _AddTripModalState extends State<AddTripModal> {
             ),
           ),
 
-          //확인 버튼
+          // 확인 버튼 → modal2 로 이동
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20), //확인 버튼 위치 조절
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: SizedBox(
-              width: 350,
               height: 40,
+              width: 350,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); //현재 modal 닫기
+                  Navigator.pop(context);
 
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (ctx) => const AddTripModal2(), //modal2로 이동
+                    builder: (ctx) => const AddTripModal2(),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2E80EC),
-                  foregroundColor: Colors.white,
-                  elevation: 0, //높이 차이 없애기
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -239,7 +214,7 @@ class _AddTripModalState extends State<AddTripModal> {
     );
   }
 
-  //국가, 도시, 출발일, 도착일 text 설정 부분
+  // Label
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -251,6 +226,7 @@ class _AddTripModalState extends State<AddTripModal> {
     );
   }
 
+  // 텍스트 입력창
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
@@ -261,19 +237,15 @@ class _AddTripModalState extends State<AddTripModal> {
         controller: controller,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.grey, fontSize: 14), //텍스트 박스 안 예시 텍스트
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          
+          hintStyle: const TextStyle(color: Colors.grey),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFBFBFBF)), //텍스트 박스 보더 설정
           ),
-          
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: Color(0xFFBFBFBF)),
           ),
-          
           focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(8)),
             borderSide: BorderSide(color: Color(0xFF2E6BFF)),
@@ -283,36 +255,35 @@ class _AddTripModalState extends State<AddTripModal> {
     );
   }
 
-  
-  //출발일, 도착일 커스텀 부분
-  Widget _buildDatePickerField(
-      BuildContext context, {
-        DateTime? date,
-        required VoidCallback onTap,
-      }) {
+  // 날짜 선택창
+  Widget _buildDatePickerField({
+    required DateTime? date,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           border: Border.all(color: const Color(0xFFBFBFBF)),
           borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              date != null
-                  ? DateFormat('yyyy-MM-dd').format(date)
-                  : '-/-/-',
+              date != null ? DateFormat('yyyy-MM-dd').format(date) : '-/-/-',
               style: TextStyle(
-                color: date != null ? Colors.black : Colors.grey, //날짜 선택 전이거나 NULL이면 회색, 선택되면 검정
+                color: date != null ? Colors.black : Colors.grey,
                 fontSize: 14,
               ),
             ),
-            Icon(Icons.calendar_today_outlined,
-                size: 18, color: Colors.black), //캘린더 아이콘 색깔 설정
+            const Icon(
+              Icons.calendar_today_outlined,
+              size: 18,
+              color: Colors.black,
+            ),
           ],
         ),
       ),

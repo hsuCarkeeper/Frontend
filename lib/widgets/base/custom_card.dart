@@ -5,6 +5,7 @@ class CustomCard extends StatelessWidget {
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? padding;
   final Color? backgroundColor;
+  final Gradient? gradient;
   final double? elevation;
   final BorderRadius? borderRadius;
 
@@ -14,6 +15,7 @@ class CustomCard extends StatelessWidget {
     this.onTap,
     this.padding,
     this.backgroundColor,
+    this.gradient,
     this.elevation,
     this.borderRadius,
   });
@@ -22,7 +24,8 @@ class CustomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final card = Container(
       decoration: BoxDecoration(
-        color: backgroundColor ?? Colors.white,
+        color: gradient == null ? (backgroundColor ?? Colors.white) : null,
+        gradient: gradient,
         borderRadius: borderRadius ?? BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

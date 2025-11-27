@@ -1,3 +1,4 @@
+// 기존 로컬 Trip 모델 (체크리스트 화면용)
 class Trip {
   final String id;
   final String destination;
@@ -24,4 +25,17 @@ class Trip {
     final nights = endDate.difference(startDate).inDays;
     return '$nights박${nights + 1}일';
   }
+}
+
+// 체크리스트 아이템
+class ChecklistItem {
+  final String id;
+  final String title;
+  bool isCompleted;
+
+  ChecklistItem({
+    required this.id,
+    required this.title,
+    this.isCompleted = false,
+  });
 }

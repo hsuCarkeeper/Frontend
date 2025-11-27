@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../models/trip.dart';
 import '../../widgets/base/custom_card.dart';
 import '../../widgets/feature/top_nav_bar.dart';
+
 import 'widgets/add_trip_modal.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -59,19 +61,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final monthNames = [
-      '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'
+      '1월', '2월', '3월', '4월', '5월', '6월',
+      '7월', '8월', '9월', '10월', '11월', '12월'
     ];
+
     final dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: const TopNavBar(title: '여행 캘린더'),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 상단 텍스트
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -90,38 +96,41 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 20),
 
               // 캘린더 카드
               CustomCard(
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () => navigateMonth(-1),
-                            icon: const Icon(Icons.chevron_left, color: Color(0xFF555555)),
+                    const SizedBox(height: 8),
+
+                    // 월 네비게이션
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () => navigateMonth(-1),
+                          icon: const Icon(Icons.chevron_left, color: Color(0xFF555555)),
+                        ),
+                        Text(
+                          '${selectedDate.year}년 ${monthNames[selectedDate.month - 1]}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF111111),
                           ),
-                          Text(
-                            '${selectedDate.year}년 ${monthNames[selectedDate.month - 1]}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF111111),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => navigateMonth(1),
-                            icon: const Icon(Icons.chevron_right, color: Color(0xFF555555)),
-                          ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          onPressed: () => navigateMonth(1),
+                          icon: const Icon(Icons.chevron_right, color: Color(0xFF555555)),
+                        ),
+                      ],
                     ),
+
                     const SizedBox(height: 16),
 
+                    // 요일 표시
                     Row(
                       children: dayNames.asMap().entries.map((entry) {
                         final index = entry.key;
@@ -136,16 +145,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 color: index == 0
                                     ? Colors.red
                                     : index == 6
-                                    ? Colors.blue
-                                    : const Color(0xFF555555),
+                                        ? Colors.blue
+                                        : const Color(0xFF555555),
                               ),
                             ),
                           ),
                         );
                       }).toList(),
                     ),
+
                     const SizedBox(height: 8),
 
+                    // 날짜 Grid
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -176,7 +187,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: isToday ? Colors.white : const Color(0xFF111111),
+                                  color: isToday
+                                      ? Colors.white
+                                      : const Color(0xFF111111),
                                 ),
                               ),
                             ),
@@ -185,27 +198,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       },
                     ),
 
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.circle, size: 10, color: Color(0xFF2E80EC)),
-                          SizedBox(width: 4),
-                          Text("오늘", style: TextStyle(fontSize: 11, color: Color(0xFF555555))),
-                          SizedBox(width: 16),
-                          Icon(Icons.circle, size: 10, color: Color(0xFFE3F2FD)),
-                          SizedBox(width: 4),
-                          Text("여행 일정", style: TextStyle(fontSize: 11, color: Color(0xFF555555))),
-                        ],
-                      ),
-                    )
+                    const SizedBox(height: 16),
+
+                    // 오늘/여행 일정 범례
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.circle, size: 10, color: Color(0xFF2E6BFF)),
+                        SizedBox(width: 4),
+                        Text("오늘", style: TextStyle(fontSize: 11, color: Color(0xFF555555))),
+                        SizedBox(width: 16),
+                        Icon(Icons.circle, size: 10, color: Color(0xFFE3F2FD)),
+                        SizedBox(width: 4),
+                        Text("여행 일정", style: TextStyle(fontSize: 11, color: Color(0xFF555555))),
+                      ],
+                    ),
                   ],
                 ),
               ),
+
               const SizedBox(height: 12),
 
-              // [수정] 새 여행 추가 카드 (너비 356 고정)
+              // 새 여행 추가 카드
               Center(
                 child: SizedBox(
                   width: 356,
@@ -218,7 +232,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         builder: (context) => AddTripModal(onSave: handleAddTrip),
                       );
                     },
-
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Column(
@@ -256,11 +269,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 40),
             ],
           ),
         ),
       ),
+
       bottomNavigationBar: _buildBottomNavBar(context),
     );
   }
