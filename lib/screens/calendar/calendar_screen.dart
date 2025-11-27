@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../widgets/feature/top_nav_bar.dart';
-import '../../widgets/feature/bottom_nav_bar.dart';
-import '../../widgets/base/custom_card.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../models/trip.dart';
+import '../../widgets/base/custom_card.dart';
+import '../../widgets/feature/top_nav_bar.dart';
+
 import 'widgets/add_trip_modal.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -20,6 +22,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     setState(() {
       trips.add(trip);
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${trip.destination} 여행이 추가되었습니다.')),
+    );
   }
 
   DateTime getCurrentMonth() {
@@ -55,30 +61,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final monthNames = [
-      '1월',
-      '2월',
-      '3월',
-      '4월',
-      '5월',
-      '6월',
-      '7월',
-      '8월',
-      '9월',
-      '10월',
-      '11월',
-      '12월'
+      '1월', '2월', '3월', '4월', '5월', '6월',
+      '7월', '8월', '9월', '10월', '11월', '12월'
     ];
+
     final dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: const TopNavBar(title: '내 여행 일정'),
+      appBar: const TopNavBar(title: '여행 캘린더'),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 상단 텍스트
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -90,44 +89,48 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       color: Color(0xFF111111),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 12),
                   const Text(
                     '다가오는 여행을 확인하고 관리하세요',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF555555)),
+                    style: TextStyle(fontSize: 12, color: Color(0xFFABA9A9)),
                   ),
                 ],
               ),
+
               const SizedBox(height: 20),
+
+              // 캘린더 카드
               CustomCard(
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () => navigateMonth(-1),
-                            icon: const Icon(Icons.chevron_left,
-                                color: Color(0xFF555555)),
+                    const SizedBox(height: 8),
+
+                    // 월 네비게이션
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () => navigateMonth(-1),
+                          icon: const Icon(Icons.chevron_left, color: Color(0xFF555555)),
+                        ),
+                        Text(
+                          '${selectedDate.year}년 ${monthNames[selectedDate.month - 1]}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF111111),
                           ),
-                          Text(
-                            '${selectedDate.year}년 ${monthNames[selectedDate.month - 1]}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF111111),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => navigateMonth(1),
-                            icon: const Icon(Icons.chevron_right,
-                                color: Color(0xFF555555)),
-                          ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          onPressed: () => navigateMonth(1),
+                          icon: const Icon(Icons.chevron_right, color: Color(0xFF555555)),
+                        ),
+                      ],
                     ),
+
                     const SizedBox(height: 16),
+
+                    // 요일 표시
                     Row(
                       children: dayNames.asMap().entries.map((entry) {
                         final index = entry.key;
@@ -150,12 +153,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         );
                       }).toList(),
                     ),
+
                     const SizedBox(height: 8),
+
+                    // 날짜 Grid
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 7,
                         childAspectRatio: 1,
                       ),
@@ -174,9 +179,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             height: 28,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: isToday
-                                  ? const Color(0xFF2E6BFF)
-                                  : Colors.transparent,
+                              color: isToday ? const Color(0xFF2E6BFF) : Colors.transparent,
                             ),
                             child: Center(
                               child: Text(
@@ -194,82 +197,177 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         );
                       },
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.circle,
-                              size: 10, color: Color(0xFF2E6BFF)),
-                          SizedBox(width: 4),
-                          Text("오늘",
-                              style: TextStyle(
-                                  fontSize: 11, color: Color(0xFF555555))),
-                          SizedBox(width: 16),
-                          Icon(Icons.circle,
-                              size: 10, color: Color(0xFFE3F2FD)),
-                          SizedBox(width: 4),
-                          Text("여행 일정",
-                              style: TextStyle(
-                                  fontSize: 11, color: Color(0xFF555555))),
-                        ],
-                      ),
-                    )
+
+                    const SizedBox(height: 16),
+
+                    // 오늘/여행 일정 범례
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.circle, size: 10, color: Color(0xFF2E6BFF)),
+                        SizedBox(width: 4),
+                        Text("오늘", style: TextStyle(fontSize: 11, color: Color(0xFF555555))),
+                        SizedBox(width: 16),
+                        Icon(Icons.circle, size: 10, color: Color(0xFFE3F2FD)),
+                        SizedBox(width: 4),
+                        Text("여행 일정", style: TextStyle(fontSize: 11, color: Color(0xFF555555))),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              CustomCard(
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => AddTripModal(onSave: handleAddTrip),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFE8F0FE),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          color: Color(0xFF2E6BFF),
-                          size: 32,
-                        ),
+
+              const SizedBox(height: 12),
+
+              // 새 여행 추가 카드
+              Center(
+                child: SizedBox(
+                  width: 356,
+                  child: CustomCard(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => AddTripModal(onSave: handleAddTrip),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 90,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE8F0FE),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const Icon(
+                              Icons.add,
+                              color: Color(0xFF2E80EC),
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            '새 여행 추가',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF111111),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            '새로운 여행을 계획하세요',
+                            style: TextStyle(fontSize: 12, color: Color(0xFF555555)),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        '새 여행 추가',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF111111),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        '새로운 여행을 계획하세요',
-                        style:
-                            TextStyle(fontSize: 12, color: Color(0xFF555555)),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 40),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(currentPath: '/calendar'),
+
+      bottomNavigationBar: _buildBottomNavBar(context),
+    );
+  }
+
+  Widget _buildBottomNavBar(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+      ),
+      child: SafeArea(
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
+                label: '홈',
+                isActive: false,
+                onTap: () => context.go('/'),
+              ),
+              _NavItem(
+                icon: Icons.calendar_today_outlined,
+                activeIcon: Icons.calendar_today,
+                label: '캘린더',
+                isActive: true,
+                onTap: () {},
+              ),
+              _NavItem(
+                icon: Icons.check_box_outlined,
+                activeIcon: Icons.check_box,
+                label: '체크리스트',
+                isActive: false,
+                onTap: () => context.go('/checklist'),
+              ),
+              _NavItem(
+                icon: Icons.settings_outlined,
+                activeIcon: Icons.settings,
+                label: '설정',
+                isActive: false,
+                onTap: () => context.go('/settings'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isActive ? activeIcon : icon,
+              color: isActive ? const Color(0xFF2E80EC) : const Color(0xFF555555),
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isActive ? const Color(0xFF2E80EC) : const Color(0xFF555555),
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

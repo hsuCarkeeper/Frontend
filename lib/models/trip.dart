@@ -7,8 +7,8 @@ class Trip {
   final DateTime endDate;
   final int completionRate;
   final int daysLeft;
-  final String weather;
-  final String flag;
+
+
 
   Trip({
     required this.id,
@@ -18,8 +18,7 @@ class Trip {
     required this.endDate,
     required this.completionRate,
     required this.daysLeft,
-    required this.weather,
-    required this.flag,
+
   });
 
   String get dateRange {
