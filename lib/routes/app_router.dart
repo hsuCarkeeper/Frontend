@@ -2,13 +2,11 @@ import 'package:go_router/go_router.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/calendar/calendar_screen.dart';
 import '../screens/checklist/checklist_screen.dart';
-import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/templates/templates_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/auth/welcome_screen.dart';
-import '../screens/auth/forgot_password_screen.dart';
 import '../screens/not_found_screen.dart';
 
 final appRouter = GoRouter(
@@ -31,10 +29,6 @@ final appRouter = GoRouter(
       },
     ),
     GoRoute(
-      path: '/notifications',
-      builder: (context, state) => const NotificationsScreen(),
-    ),
-    GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
     ),
@@ -53,10 +47,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/auth/welcome',
       builder: (context, state) => const WelcomeScreen(),
-    ),
-    GoRoute(
-      path: '/auth/forgot-password',
-      builder: (context, state) => const ForgotPasswordScreen(),
     ),
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),
